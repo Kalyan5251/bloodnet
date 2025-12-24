@@ -39,7 +39,7 @@ A comprehensive web application that connects blood donors, patients, and hospit
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/your-username/bloodnet.git
+git clone https://github.com/Kalyan5251/bloodnet.git
 cd bloodnet
 ```
 
