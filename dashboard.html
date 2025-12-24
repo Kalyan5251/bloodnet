@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BloodNet - Hospital Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="static/css/main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 50%, #991b1b 100%);
+        }
+        .heart-pulse {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+            border: 2px solid #fecaca;
+        }
+        .stat-card.urgent {
+            background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%);
+            border-color: #dc2626;
+            animation: urgent-pulse 2s infinite;
+        }
+        @keyframes urgent-pulse {
+            0%, 100% { border-color: #dc2626; }
+            50% { border-color: #ef4444; }
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50">
+    <!-- Navigation -->
+    <nav class="navbar fixed top-0 w-full z-40 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <div class="flex items-center space-x-3">
+                        <div class="bg-white rounded-full p-2 shadow-lg">
+                            <svg class="w-6 h-6 text-red-600 heart-pulse" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                            </svg>
+                        </div>
+                        <span class="text-xl font-bold text-white">BloodNet Dashboard</span>
+                    </div>
+                </div>
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="index.html" class="text-white hover:text-red-200 transition-colors">Home</a>
+                    <a href="donorSearch.html" class="text-white hover:text-red-200 transition-colors">Find Donor</a>
+                    <a href="login.html" class="text-white hover:text-red-200 transition-colors">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="gradient-bg pt-20 pb-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <h1 class="text-4xl font-bold text-white mb-4">Hospital Dashboard</h1>
+                <p class="text-red-100 text-lg max-w-2xl mx-auto">
+                    Manage your blood inventory, track donations, and coordinate with donors in real-time.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Dashboard Content -->
+    <section class="py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <!-- Total Donors -->
+                <div class="stat-card rounded-xl p-6 card-hover">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Total Donors</p>
+                            <p class="text-3xl font-bold text-red-600">2,847</p>
+                            <p class="text-xs text-green-600">+12% this month</p>
+                        </div>
+                        <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active Requests -->
+                <div class="stat-card rounded-xl p-6 card-hover">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Active Requests</p>
+                            <p class="text-3xl font-bold text-red-600">23</p>
+                            <p class="text-xs text-red-600">3 urgent</p>
+                        </div>
+                        <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Blood Units Available -->
+                <div class="stat-card rounded-xl p-6 card-hover">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Blood Units</p>
+                            <p class="text-3xl font-bold text-red-600">1,247</p>
+                            <p class="text-xs text-green-600">+8% this week</p>
+                        </div>
+                        <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                            <svg class="w-6 h-6 text-red-600" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Emergency Alerts -->
+                <div class="stat-card urgent rounded-xl p-6 card-hover">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Emergency Alerts</p>
+                            <p class="text-3xl font-bold text-red-700">5</p>
+                            <p class="text-xs text-red-600">Action required</p>
+                        </div>
+                        <div class="w-12 h-12 bg-red-200 rounded-full flex items-center justify-center">
+                            <svg class="w-6 h-6 text-red-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts and Tables -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <!-- Blood Inventory Chart -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Blood Inventory by Type</h3>
+                    <div class="chart-container">
+                        <canvas id="bloodInventoryChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Donation Trends -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Donation Trends (Last 7 Days)</h3>
+                    <div class="chart-container">
+                        <canvas id="donationTrendsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Blood Stock by Type -->
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+                <h3 class="text-lg font-semibold text-gray-900 mb-6">Live Blood Stock</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
+                    <div class="text-center p-4 bg-gray-50 rounded-lg">
+                        <div class="text-2xl font-bold text-red-600 mb-1">A+</div>
+                        <div class="text-lg font-semibold text-gray-800">45</div>
+                        <div class="text-xs text-gray-600">units</div>
+                    </div>
+                    <div class="text-center p-4 bg-gray-50 rounded-lg">
+                        <div class="text-2xl font-bold text-red-600 mb-1">A-</div>
+                        <div class="text-lg font-semibold text-red-700">12</div>
+                        <div class="text-xs text-red-600">LOW</div>
+                    </div>
+                    <div class="text-center p-4 bg-gray-50 rounded-lg">
+                        <div class="text-2xl font-bold text-red-600 mb-1">B+</div>
+                        <div class="text-lg font-semibold text-gray-800">38</div>
+                        <div class="text-xs text-gray-600">units</div>
+                    </div>
+                    <div class="text-center p-4 bg-gray-50 rounded-lg">
+                        <div class="text-2xl font-bold text-red-600 mb-1">B-</div>
+                        <div class="text-lg font-semibold text-red-700">8</div>
+                        <div class="text-xs text-red-600">LOW</div>
+                    </div>
+                    <div class="text-center p-4 bg-gray-50 rounded-lg">
+                        <div class="text-2xl font-bold text-red-600 mb-1">AB+</div>
+                        <div class="text-lg font-semibold text-gray-800">15</div>
+                        <div class="text-xs text-gray-600">units</div>
+                    </div>
+                    <div class="text-center p-4 bg-gray-50 rounded-lg">
+                        <div class="text-2xl font-bold text-red-600 mb-1">AB-</div>
+                        <div class="text-lg font-semibold text-red-700">3</div>
+                        <div class="text-xs text-red-600">CRITICAL</div>
+                    </div>
+                    <div class="text-center p-4 bg-gray-50 rounded-lg">
+                        <div class="text-2xl font-bold text-red-600 mb-1">O+</div>
+                        <div class="text-lg font-semibold text-gray-800">67</div>
+                        <div class="text-xs text-gray-600">units</div>
+                    </div>
+                    <div class="text-center p-4 bg-gray-50 rounded-lg">
+                        <div class="text-2xl font-bold text-red-600 mb-1">O-</div>
+                        <div class="text-lg font-semibold text-red-700">5</div>
+                        <div class="text-xs text-red-600">CRITICAL</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Requests Table -->
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-lg font-semibold text-gray-900">Recent Blood Requests</h3>
+                    <button class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors">
+                        + New Request
+                    </button>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b border-gray-200">
+                                <th class="text-left py-3 px-4 font-semibold text-gray-700">Patient ID</th>
+                                <th class="text-left py-3 px-4 font-semibold text-gray-700">Blood Type</th>
+                                <th class="text-left py-3 px-4 font-semibold text-gray-700">Units Needed</th>
+                                <th class="text-left py-3 px-4 font-semibold text-gray-700">Priority</th>
+                                <th class="text-left py-3 px-4 font-semibold text-gray-700">Status</th>
+                                <th class="text-left py-3 px-4 font-semibold text-gray-700">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-b border-gray-100">
+                                <td class="py-3 px-4 text-gray-900">#P001234</td>
+                                <td class="py-3 px-4">
+                                    <span class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-sm font-semibold">O+</span>
+                                </td>
+                                <td class="py-3 px-4 text-gray-900">2 units</td>
+                                <td class="py-3 px-4">
+                                    <span class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-semibold">High</span>
+                                </td>
+                                <td class="py-3 px-4">
+                                    <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-semibold">Pending</span>
+                                </td>
+                                <td class="py-3 px-4">
+                                    <button class="text-red-600 hover:text-red-700 text-sm font-medium">View Details</button>
+                                </td>
+                            </tr>
+                            <tr class="border-b border-gray-100">
+                                <td class="py-3 px-4 text-gray-900">#P001235</td>
+                                <td class="py-3 px-4">
+                                    <span class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-sm font-semibold">A-</span>
+                                </td>
+                                <td class="py-3 px-4 text-gray-900">1 unit</td>
+                                <td class="py-3 px-4">
+                                    <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-semibold">Medium</span>
+                                </td>
+                                <td class="py-3 px-4">
+                                    <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-semibold">Matched</span>
+                                </td>
+                                <td class="py-3 px-4">
+                                    <button class="text-red-600 hover:text-red-700 text-sm font-medium">View Details</button>
+                                </td>
+                            </tr>
+                            <tr class="border-b border-gray-100">
+                                <td class="py-3 px-4 text-gray-900">#P001236</td>
+                                <td class="py-3 px-4">
+                                    <span class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-sm font-semibold">AB-</span>
+                                </td>
+                                <td class="py-3 px-4 text-gray-900">3 units</td>
+                                <td class="py-3 px-4">
+                                    <span class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-semibold">Critical</span>
+                                </td>
+                                <td class="py-3 px-4">
+                                    <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-semibold">Searching</span>
+                                </td>
+                                <td class="py-3 px-4">
+                                    <button class="text-red-600 hover:text-red-700 text-sm font-medium">View Details</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Donor Management -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-lg font-semibold text-gray-900">Donor Management</h3>
+                    <div class="flex space-x-3">
+                        <button class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors">
+                            Export Data
+                        </button>
+                        <button class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors">
+                            Send Notification
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="text-center p-4 bg-gray-50 rounded-lg">
+                        <div class="text-2xl font-bold text-gray-900 mb-2">1,247</div>
+                        <div class="text-sm text-gray-600">Active Donors</div>
+                    </div>
+                    <div class="text-center p-4 bg-gray-50 rounded-lg">
+                        <div class="text-2xl font-bold text-gray-900 mb-2">89</div>
+                        <div class="text-sm text-gray-600">New This Month</div>
+                    </div>
+                    <div class="text-center p-4 bg-gray-50 rounded-lg">
+                        <div class="text-2xl font-bold text-gray-900 mb-2">156</div>
+                        <div class="text-sm text-gray-600">Donations This Week</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="col-span-1 md:col-span-2">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-red-600 rounded-full p-2 mr-3">
+                            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                            </svg>
+                        </div>
+                        <span class="text-2xl font-bold">BloodNet</span>
+                    </div>
+                    <p class="text-gray-400 mb-4">
+                        Connecting life-saving blood donors with patients in need through smart technology and compassionate care.
+                    </p>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Quick Links</h3>
+                    <ul class="space-y-2">
+                        <li><a href="index.html" class="text-gray-400 hover:text-white transition-colors">Home</a></li>
+                        <li><a href="donorSearch.html" class="text-gray-400 hover:text-white transition-colors">Find Donor</a></li>
+                        <li><a href="register.html" class="text-gray-400 hover:text-white transition-colors">Register</a></li>
+                        <li><a href="login.html" class="text-gray-400 hover:text-white transition-colors">Login</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Contact</h3>
+                    <div class="space-y-2 text-gray-400">
+                        <p>📞 +1 (555) 123-4567</p>
+                        <p>✉️ support@bloodnet.com</p>
+                        <p>📍 123 Medical Center, Health City</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2024 BloodNet. Making a difference, one donation at a time.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="static/js/app.js"></script>
+    <script src="static/js/chat.js"></script>
+    <script src="static/js/aiAssistant.js"></script>
+    
+    <script>
+        // Initialize charts
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+            startRealTimeUpdates();
+        });
+
+        function initializeCharts() {
+            // Blood Inventory Chart
+            const bloodInventoryCtx = document.getElementById('bloodInventoryChart').getContext('2d');
+            new Chart(bloodInventoryCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
+                    datasets: [{
+                        data: [45, 12, 38, 8, 15, 3, 67, 5],
+                        backgroundColor: [
+                            '#dc2626',
+                            '#ef4444',
+                            '#f87171',
+                            '#fca5a5',
+                            '#fecaca',
+                            '#fef2f2',
+                            '#991b1b',
+                            '#7f1d1d'
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Donation Trends Chart
+            const donationTrendsCtx = document.getElementById('donationTrendsChart').getContext('2d');
+            new Chart(donationTrendsCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Donations',
+                        data: [12, 19, 15, 25, 22, 18, 14],
+                        borderColor: '#dc2626',
+                        backgroundColor: 'rgba(220, 38, 38, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: '#f3f4f6'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: '#f3f4f6'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        function startRealTimeUpdates() {
+            // Simulate real-time updates every 30 seconds
+            setInterval(() => {
+                updateStats();
+            }, 30000);
+        }
+
+        function updateStats() {
+            // Simulate real-time stat updates
+            const stats = document.querySelectorAll('.stat-card .text-3xl');
+            stats.forEach(stat => {
+                const currentValue = parseInt(stat.textContent.replace(/,/g, ''));
+                const change = Math.floor(Math.random() * 3) - 1; // -1, 0, or 1
+                const newValue = Math.max(0, currentValue + change);
+                stat.textContent = newValue.toLocaleString();
+            });
+        }
+
+        // Add interactive features
+        function addInteractiveFeatures() {
+            // Add click handlers for stat cards
+            document.querySelectorAll('.stat-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    // Add visual feedback
+                    this.style.transform = 'scale(0.98)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 150);
+                });
+            });
+
+            // Add hover effects for table rows
+            document.querySelectorAll('tbody tr').forEach(row => {
+                row.addEventListener('mouseenter', function() {
+                    this.style.backgroundColor = '#fef2f2';
+                });
+                row.addEventListener('mouseleave', function() {
+                    this.style.backgroundColor = '';
+                });
+            });
+        }
+
+        // Initialize interactive features
+        document.addEventListener('DOMContentLoaded', function() {
+            addInteractiveFeatures();
+        });
+    </script>
+</body>
+</html>

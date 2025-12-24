@@ -1,0 +1,493 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BloodNet - Anonymous Chat</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="static/css/main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 50%, #991b1b 100%);
+        }
+        .heart-pulse {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        .chat-bubble {
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .typing-indicator {
+            animation: typing 1.5s infinite;
+        }
+        @keyframes typing {
+            0%, 60%, 100% { opacity: 0.3; }
+            30% { opacity: 1; }
+        }
+        .message-user {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+        }
+        .message-donor {
+            background: #f3f4f6;
+        }
+        .consent-toggle {
+            transition: all 0.3s ease;
+        }
+        .consent-toggle.checked {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50">
+    <!-- Navigation -->
+    <nav class="navbar fixed top-0 w-full z-40 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <div class="flex items-center space-x-3">
+                        <div class="bg-white rounded-full p-2 shadow-lg">
+                            <svg class="w-6 h-6 text-red-600 heart-pulse" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                            </svg>
+                        </div>
+                        <span class="text-xl font-bold text-white">BloodNet</span>
+                    </div>
+                </div>
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="index.html" class="text-white hover:text-red-200 transition-colors">Home</a>
+                    <a href="donorSearch.html" class="text-white hover:text-red-200 transition-colors">Find Donor</a>
+                    <a href="login.html" class="text-white hover:text-red-200 transition-colors">Login</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="gradient-bg pt-20 pb-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <h1 class="text-4xl font-bold text-white mb-4">Anonymous Chat</h1>
+                <p class="text-red-100 text-lg max-w-2xl mx-auto">
+                    Connect securely with blood donors. Your privacy is protected with end-to-end encryption.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Chat Interface -->
+    <section class="py-12">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Chat Container -->
+            <div class="bg-white rounded-2xl shadow-2xl overflow-hidden">
+                <!-- Chat Header -->
+                <div class="bg-red-600 text-white p-6">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 bg-green-400 rounded-full mr-3"></div>
+                            <div>
+                                <h2 class="text-xl font-semibold">Anonymous Chat</h2>
+                                <p class="text-red-100 text-sm">🔒 Privacy-first & secure • Personal info shared only after mutual consent</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <div class="text-sm">
+                                <span class="text-red-100">Connection:</span>
+                                <span class="text-green-300 font-semibold">Secure</span>
+                            </div>
+                            <button onclick="toggleConsent()" 
+                                    class="bg-white bg-opacity-20 px-3 py-1 rounded-full text-sm hover:bg-opacity-30 transition-colors">
+                                ⚙️ Settings
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Messages -->
+                <div id="chatMessages" class="h-96 overflow-y-auto p-6 space-y-4">
+                    <!-- Welcome Message -->
+                    <div class="flex justify-center">
+                        <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 max-w-md text-center">
+                            <div class="flex items-center justify-center mb-2">
+                                <svg class="w-6 h-6 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                                </svg>
+                                <span class="font-semibold text-blue-800">Secure Connection Established</span>
+                            </div>
+                            <p class="text-blue-700 text-sm">
+                                You are now connected anonymously. Personal information will only be shared after mutual consent.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Sample Messages -->
+                    <div class="flex justify-end">
+                        <div class="max-w-xs lg:max-w-md">
+                            <div class="message-user text-white rounded-2xl px-4 py-2 chat-bubble">
+                                <div class="text-sm">Hello! I need O+ blood urgently. Are you available?</div>
+                                <div class="flex items-center justify-end mt-1 text-xs opacity-70">
+                                    <span>2:30 PM</span>
+                                    <svg class="w-3 h-3 ml-1" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-start">
+                        <div class="max-w-xs lg:max-w-md">
+                            <div class="message-donor text-gray-800 rounded-2xl px-4 py-2 chat-bubble">
+                                <div class="text-sm">Yes, I have O+ blood type. I can help you. Where do you need me to come?</div>
+                                <div class="flex items-center justify-end mt-1 text-xs text-gray-500">
+                                    <span>2:31 PM</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end">
+                        <div class="max-w-xs lg:max-w-md">
+                            <div class="message-user text-white rounded-2xl px-4 py-2 chat-bubble">
+                                <div class="text-sm">Thank you so much! It's at City General Hospital. Can you come within an hour?</div>
+                                <div class="flex items-center justify-end mt-1 text-xs opacity-70">
+                                    <span>2:32 PM</span>
+                                    <svg class="w-3 h-3 ml-1" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Typing Indicator -->
+                <div id="typingIndicator" class="px-6 py-2 hidden">
+                    <div class="flex items-center text-gray-500">
+                        <div class="typing-indicator mr-2">●</div>
+                        <div class="typing-indicator mr-2" style="animation-delay: 0.2s">●</div>
+                        <div class="typing-indicator" style="animation-delay: 0.4s">●</div>
+                        <span class="ml-2 text-sm">Donor is typing...</span>
+                    </div>
+                </div>
+
+                <!-- Chat Input -->
+                <div class="p-6 border-t border-gray-200">
+                    <div class="flex space-x-3">
+                        <input type="text" id="chatInput" placeholder="Type your message..." 
+                               class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                               onkeypress="handleKeyPress(event)">
+                        <button onclick="sendMessage()" 
+                                class="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <!-- Privacy Notice -->
+                    <div class="mt-3 text-xs text-gray-500 text-center">
+                        🔒 Messages are encrypted end-to-end • Your identity remains anonymous until you choose to share it
+                    </div>
+                </div>
+            </div>
+
+            <!-- Consent Modal -->
+            <div id="consentModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+                <div class="bg-white rounded-2xl p-8 max-w-md mx-4">
+                    <div class="text-center mb-6">
+                        <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Share Personal Information?</h3>
+                        <p class="text-gray-600">Would you like to share your contact details to coordinate the blood donation?</p>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <label class="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
+                            <input type="checkbox" id="sharePhone" class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded">
+                            <span class="ml-3 text-sm text-gray-700">Share phone number</span>
+                        </label>
+                        <label class="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
+                            <input type="checkbox" id="shareLocation" class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded">
+                            <span class="ml-3 text-sm text-gray-700">Share location</span>
+                        </label>
+                        <label class="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
+                            <input type="checkbox" id="shareName" class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded">
+                            <span class="ml-3 text-sm text-gray-700">Share name</span>
+                        </label>
+                    </div>
+                    
+                    <div class="flex space-x-3 mt-6">
+                        <button onclick="closeConsentModal()" 
+                                class="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                            Cancel
+                        </button>
+                        <button onclick="confirmConsent()" 
+                                class="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors">
+                            Share Information
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-12 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Secure & Private</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">
+                    Your privacy and security are our top priorities. All communications are protected.
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="text-center">
+                    <div class="bg-red-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">End-to-End Encryption</h3>
+                    <p class="text-gray-600 text-sm">All messages are encrypted and cannot be read by anyone else.</p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="bg-red-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Anonymous Communication</h3>
+                    <p class="text-gray-600 text-sm">Your identity remains hidden until you choose to share it.</p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="bg-red-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Consent-Based Sharing</h3>
+                    <p class="text-gray-600 text-sm">Personal information is only shared with mutual consent.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="col-span-1 md:col-span-2">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-red-600 rounded-full p-2 mr-3">
+                            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                            </svg>
+                        </div>
+                        <span class="text-2xl font-bold">BloodNet</span>
+                    </div>
+                    <p class="text-gray-400 mb-4">
+                        Connecting life-saving blood donors with patients in need through smart technology and compassionate care.
+                    </p>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Quick Links</h3>
+                    <ul class="space-y-2">
+                        <li><a href="index.html" class="text-gray-400 hover:text-white transition-colors">Home</a></li>
+                        <li><a href="donorSearch.html" class="text-gray-400 hover:text-white transition-colors">Find Donor</a></li>
+                        <li><a href="register.html" class="text-gray-400 hover:text-white transition-colors">Register</a></li>
+                        <li><a href="login.html" class="text-gray-400 hover:text-white transition-colors">Login</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Contact</h3>
+                    <div class="space-y-2 text-gray-400">
+                        <p>📞 +1 (555) 123-4567</p>
+                        <p>✉️ support@bloodnet.com</p>
+                        <p>📍 123 Medical Center, Health City</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2024 BloodNet. Making a difference, one donation at a time.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="static/js/app.js"></script>
+    <script src="static/js/chat.js"></script>
+    <script src="static/js/aiAssistant.js"></script>
+    
+    <script>
+        let isTyping = false;
+        let messageCount = 0;
+
+        // Initialize chat
+        document.addEventListener('DOMContentLoaded', function() {
+            setupChatEventListeners();
+            simulateIncomingMessage();
+        });
+
+        function setupChatEventListeners() {
+            const chatInput = document.getElementById('chatInput');
+            chatInput.addEventListener('input', function() {
+                if (!isTyping && this.value.length > 0) {
+                    showTypingIndicator();
+                }
+            });
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function sendMessage() {
+            const chatInput = document.getElementById('chatInput');
+            const message = chatInput.value.trim();
+            
+            if (!message) return;
+            
+            // Add user message
+            addMessage(message, 'user');
+            chatInput.value = '';
+            
+            // Clear typing indicator
+            hideTypingIndicator();
+            
+            // Simulate donor response
+            setTimeout(() => {
+                simulateDonorResponse();
+            }, 2000);
+        }
+
+        function addMessage(message, sender) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            
+            if (sender === 'user') {
+                messageDiv.className = 'flex justify-end';
+                messageDiv.innerHTML = `
+                    <div class="max-w-xs lg:max-w-md">
+                        <div class="message-user text-white rounded-2xl px-4 py-2 chat-bubble">
+                            <div class="text-sm">${message}</div>
+                            <div class="flex items-center justify-end mt-1 text-xs opacity-70">
+                                <span>${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                                <svg class="w-3 h-3 ml-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                messageDiv.className = 'flex justify-start';
+                messageDiv.innerHTML = `
+                    <div class="max-w-xs lg:max-w-md">
+                        <div class="message-donor text-gray-800 rounded-2xl px-4 py-2 chat-bubble">
+                            <div class="text-sm">${message}</div>
+                            <div class="flex items-center justify-end mt-1 text-xs text-gray-500">
+                                <span>${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function simulateDonorResponse() {
+            const responses = [
+                "I understand. Let me check my schedule.",
+                "That works for me. I'll be there soon.",
+                "Thank you for the information. I'm on my way.",
+                "Perfect! I'll bring my ID and medical records.",
+                "I'm available now. What's the exact location?",
+                "I've donated before, so I know the process.",
+                "Is there anything specific I need to know?",
+                "I'm ready to help. Every life matters!"
+            ];
+            
+            const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+            addMessage(randomResponse, 'donor');
+        }
+
+        function simulateIncomingMessage() {
+            // Simulate incoming message after 10 seconds
+            setTimeout(() => {
+                addMessage("Hello! I saw your blood request. I have O+ blood type.", 'donor');
+            }, 10000);
+        }
+
+        function showTypingIndicator() {
+            const typingIndicator = document.getElementById('typingIndicator');
+            if (typingIndicator) {
+                typingIndicator.classList.remove('hidden');
+                isTyping = true;
+                
+                // Hide after 3 seconds
+                setTimeout(() => {
+                    hideTypingIndicator();
+                }, 3000);
+            }
+        }
+
+        function hideTypingIndicator() {
+            const typingIndicator = document.getElementById('typingIndicator');
+            if (typingIndicator) {
+                typingIndicator.classList.add('hidden');
+                isTyping = false;
+            }
+        }
+
+        function toggleConsent() {
+            const consentModal = document.getElementById('consentModal');
+            consentModal.classList.remove('hidden');
+        }
+
+        function closeConsentModal() {
+            const consentModal = document.getElementById('consentModal');
+            consentModal.classList.add('hidden');
+        }
+
+        function confirmConsent() {
+            const sharePhone = document.getElementById('sharePhone').checked;
+            const shareLocation = document.getElementById('shareLocation').checked;
+            const shareName = document.getElementById('shareName').checked;
+            
+            if (sharePhone || shareLocation || shareName) {
+                const info = [];
+                if (sharePhone) info.push('phone number');
+                if (shareLocation) info.push('location');
+                if (shareName) info.push('name');
+                
+                addMessage(`I'm sharing my ${info.join(', ')} with you.`, 'user');
+                closeConsentModal();
+            } else {
+                alert('Please select at least one piece of information to share.');
+            }
+        }
+    </script>
+</body>
+</html>

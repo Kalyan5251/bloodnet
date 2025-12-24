@@ -1,0 +1,330 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BloodNet - Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="static/css/main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            box-sizing: border-box;
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 50%, #991b1b 100%);
+        }
+        .heart-pulse {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        .form-input:focus {
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+        }
+        .tab-active {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            color: white;
+        }
+        .tab-inactive {
+            background: #f3f4f6;
+            color: #6b7280;
+            border: 1px solid #e5e7eb;
+        }
+        .tab-inactive:hover {
+            background: #e5e7eb;
+            color: #374151;
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-full">
+    <main class="min-h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-md w-full space-y-8">
+            <!-- Header -->
+            <header class="text-center">
+                <div class="flex justify-center mb-6">
+                    <div class="bg-white rounded-full p-4 shadow-lg">
+                        <svg class="w-12 h-12 text-red-600 heart-pulse" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>
+                    </div>
+                </div>
+                <h1 class="text-3xl font-bold text-white mb-2">BloodNet</h1>
+                <p class="text-red-100 text-lg">Every drop counts. Every donor matters.</p>
+            </header>
+
+            <!-- Login Form -->
+            <div class="bg-white rounded-2xl shadow-2xl p-8">
+                <div class="text-center mb-8">
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-2">Welcome Back</h2>
+                    <p class="text-gray-600">Sign in to continue your life-saving journey</p>
+                </div>
+
+                <!-- Login Type Tabs -->
+                <div class="flex mb-6 bg-gray-100 rounded-lg p-1">
+                    <button id="donorTab" onclick="switchTab('donor')" 
+                            class="flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-200 tab-active">
+                        🩸 Login as Donor
+                    </button>
+                    <button id="hospitalTab" onclick="switchTab('hospital')" 
+                            class="flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-200 tab-inactive">
+                        🏥 Login as Hospital
+                    </button>
+                </div>
+
+                <!-- Donor Login Form -->
+                <form id="donorForm" class="space-y-6" onsubmit="handleLogin(event, 'donor')">
+                    <div>
+                        <label for="donorEmail" class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                        <input 
+                            id="donorEmail" 
+                            name="email" 
+                            type="email" 
+                            required 
+                            class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
+                            placeholder="Enter your email"
+                        >
+                    </div>
+
+                    <div>
+                        <label for="donorPassword" class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                        <input 
+                            id="donorPassword" 
+                            name="password" 
+                            type="password" 
+                            required 
+                            class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
+                            placeholder="Enter your password"
+                        >
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <input 
+                                id="donorRemember" 
+                                name="remember-me" 
+                                type="checkbox" 
+                                class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
+                            >
+                            <label for="donorRemember" class="ml-2 block text-sm text-gray-700">Remember me</label>
+                        </div>
+                        <a href="#" class="text-sm text-red-600 hover:text-red-500 font-medium">Forgot password?</a>
+                    </div>
+
+                    <button 
+                        type="submit" 
+                        class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 shadow-lg hover:shadow-xl"
+                    >
+                        Sign In as Donor
+                    </button>
+                </form>
+
+                <!-- Hospital Login Form -->
+                <form id="hospitalForm" class="space-y-6 hidden" onsubmit="handleLogin(event, 'hospital')">
+                    <div>
+                        <label for="hospitalEmail" class="block text-sm font-medium text-gray-700 mb-2">Hospital Email</label>
+                        <input 
+                            id="hospitalEmail" 
+                            name="email" 
+                            type="email" 
+                            required 
+                            class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
+                            placeholder="Enter hospital email"
+                        >
+                    </div>
+
+                    <div>
+                        <label for="hospitalPassword" class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                        <input 
+                            id="hospitalPassword" 
+                            name="password" 
+                            type="password" 
+                            required 
+                            class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
+                            placeholder="Enter your password"
+                        >
+                    </div>
+
+                    <div>
+                        <label for="hospitalCode" class="block text-sm font-medium text-gray-700 mb-2">Hospital Code</label>
+                        <input 
+                            id="hospitalCode" 
+                            name="hospitalCode" 
+                            type="text" 
+                            required 
+                            class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
+                            placeholder="Enter hospital verification code"
+                        >
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <input 
+                                id="hospitalRemember" 
+                                name="remember-me" 
+                                type="checkbox" 
+                                class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
+                            >
+                            <label for="hospitalRemember" class="ml-2 block text-sm text-gray-700">Remember me</label>
+                        </div>
+                        <a href="#" class="text-sm text-red-600 hover:text-red-500 font-medium">Forgot password?</a>
+                    </div>
+
+                    <button 
+                        type="submit" 
+                        class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 shadow-lg hover:shadow-xl"
+                    >
+                        Sign In as Hospital
+                    </button>
+                </form>
+
+                <div class="mt-8 text-center">
+                    <p class="text-gray-600">New to BloodNet?</p>
+                    <a href="register.jsp" class="text-red-600 hover:text-red-500 font-semibold">Register as a donor</a>
+                    <span class="text-gray-400 mx-2">or</span>
+                    <a href="#" class="text-red-600 hover:text-red-500 font-semibold">Register as hospital</a>
+                </div>
+
+                <!-- Stats Section -->
+                <div class="mt-8 pt-6 border-t border-gray-200">
+                    <div class="grid grid-cols-3 gap-4 text-center">
+                        <div>
+                            <div class="text-2xl font-bold text-red-600">50K+</div>
+                            <div class="text-xs text-gray-600">Lives Saved</div>
+                        </div>
+                        <div>
+                            <div class="text-2xl font-bold text-red-600">25K+</div>
+                            <div class="text-xs text-gray-600">Active Donors</div>
+                        </div>
+                        <div>
+                            <div class="text-2xl font-bold text-red-600">100+</div>
+                            <div class="text-xs text-gray-600">Hospitals</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="text-center text-red-100 text-sm">
+                <p>© 2025 BloodNet. Making a difference, one donation at a time.</p>
+            </footer>
+        </div>
+    </main>
+
+    <!-- Success Message (Hidden by default) -->
+    <div id="successMessage" class="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300">
+        <div class="flex items-center">
+            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+            </svg>
+            <span id="successText">Welcome back! Redirecting to dashboard...</span>
+        </div>
+    </div>
+
+    <script>
+        let currentTab = 'donor';
+
+        function switchTab(tab) {
+            const donorTab = document.getElementById('donorTab');
+            const hospitalTab = document.getElementById('hospitalTab');
+            const donorForm = document.getElementById('donorForm');
+            const hospitalForm = document.getElementById('hospitalForm');
+
+            if (tab === 'donor') {
+                donorTab.classList.remove('tab-inactive');
+                donorTab.classList.add('tab-active');
+                hospitalTab.classList.remove('tab-active');
+                hospitalTab.classList.add('tab-inactive');
+                donorForm.classList.remove('hidden');
+                hospitalForm.classList.add('hidden');
+                currentTab = 'donor';
+            } else {
+                hospitalTab.classList.remove('tab-inactive');
+                hospitalTab.classList.add('tab-active');
+                donorTab.classList.remove('tab-active');
+                donorTab.classList.add('tab-inactive');
+                hospitalForm.classList.remove('hidden');
+                donorForm.classList.add('hidden');
+                currentTab = 'hospital';
+            }
+        }
+
+        function handleLogin(event, type) {
+            event.preventDefault();
+            
+            const email = event.target.querySelector('input[type="email"]').value;
+            const password = event.target.querySelector('input[type="password"]').value;
+            const hospitalCode = event.target.querySelector('input[name="hospitalCode"]')?.value;
+            
+            // Validate hospital code if hospital login
+            if (type === 'hospital' && (!hospitalCode || hospitalCode.length < 6)) {
+                showMessage('Please enter a valid hospital code (minimum 6 characters)', 'error');
+                return;
+            }
+            
+            // Simulate login process
+            if (email && password) {
+                const successText = document.getElementById('successText');
+                if (type === 'donor') {
+                    successText.textContent = 'Welcome back, donor! Redirecting to your dashboard...';
+                } else {
+                    successText.textContent = 'Welcome back, hospital! Redirecting to admin dashboard...';
+                }
+                
+                showMessage('Login successful!', 'success');
+                
+                // Reset form
+                event.target.reset();
+                
+                // Redirect after 2 seconds
+                setTimeout(() => {
+                    if (type === 'donor') {
+                        window.location.href = 'donorSearch.jsp';
+                    } else {
+                        window.location.href = 'dashboard.jsp';
+                    }
+                }, 2000);
+            }
+        }
+
+        function showMessage(message, type) {
+            const successMessage = document.getElementById('successMessage');
+            const messageText = successMessage.querySelector('span');
+            
+            if (type === 'error') {
+                successMessage.className = 'fixed top-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300';
+            } else {
+                successMessage.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300';
+            }
+            
+            messageText.textContent = message;
+            successMessage.classList.remove('translate-x-full');
+            
+            // Hide message after 3 seconds
+            setTimeout(() => {
+                successMessage.classList.add('translate-x-full');
+            }, 3000);
+        }
+
+        // Add some interactive feedback
+        const inputs = document.querySelectorAll('input[type="email"], input[type="password"], input[type="text"]');
+        inputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.classList.add('transform', 'scale-105');
+            });
+            
+            input.addEventListener('blur', function() {
+                this.parentElement.classList.remove('transform', 'scale-105');
+            });
+        });
+
+        // Initialize with donor tab active
+        document.addEventListener('DOMContentLoaded', function() {
+            switchTab('donor');
+        });
+    </script>
+</body>
+</html>

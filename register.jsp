@@ -1,0 +1,512 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BloodNet - Register as Donor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="static/css/main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 50%, #991b1b 100%);
+        }
+        .heart-pulse {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        .form-input:focus {
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+        }
+        .step-indicator {
+            transition: all 0.3s ease;
+        }
+        .step-active {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            color: white;
+        }
+        .step-completed {
+            background: #10b981;
+            color: white;
+        }
+        .step-pending {
+            background: #e5e7eb;
+            color: #6b7280;
+        }
+        .floating-label {
+            transition: all 0.3s ease;
+        }
+        .floating-label.focused {
+            transform: translateY(-8px) scale(0.85);
+            color: #dc2626;
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen">
+    <!-- Navigation -->
+    <nav class="navbar fixed top-0 w-full z-40 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <div class="flex items-center space-x-3">
+                        <div class="bg-white rounded-full p-2 shadow-lg">
+                            <svg class="w-6 h-6 text-red-600 heart-pulse" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                            </svg>
+                        </div>
+                        <span class="text-xl font-bold text-white">BloodNet</span>
+                    </div>
+                </div>
+                <a href="index.jsp" class="text-white hover:text-red-200 transition-colors">← Back to Home</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 pt-20">
+        <div class="max-w-2xl w-full">
+            <!-- Header -->
+            <header class="text-center mb-8">
+                <div class="flex justify-center mb-6">
+                    <div class="bg-white rounded-full p-4 shadow-lg">
+                        <svg class="w-12 h-12 text-red-600 heart-pulse" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>
+                    </div>
+                </div>
+                <h1 class="text-3xl font-bold text-white mb-2">Join BloodNet</h1>
+                <p class="text-red-100 text-lg">Become a life-saving hero today</p>
+            </header>
+
+            <!-- Registration Form -->
+            <div class="bg-white rounded-2xl shadow-2xl p-8">
+                <!-- Progress Bar -->
+                <div class="mb-8">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="step-indicator step-active w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold">1</div>
+                        <div class="flex-1 h-1 bg-gray-200 mx-2">
+                            <div id="progressBar" class="progress-bar h-full w-0 rounded-full"></div>
+                        </div>
+                        <div class="step-indicator step-pending w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold">2</div>
+                        <div class="flex-1 h-1 bg-gray-200 mx-2"></div>
+                        <div class="step-indicator step-pending w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold">3</div>
+                    </div>
+                    <div class="text-center">
+                        <span id="stepTitle" class="text-lg font-semibold text-gray-800">Personal Information</span>
+                    </div>
+                </div>
+
+                <form id="registrationForm" class="space-y-6" onsubmit="handleSubmit(event)">
+                    <!-- Step 1: Personal Information -->
+                    <div id="step1" class="step-content">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div class="relative">
+                                <input 
+                                    id="firstName" 
+                                    name="firstName" 
+                                    type="text" 
+                                    required 
+                                    class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
+                                    placeholder=" "
+                                >
+                                <label for="firstName" class="floating-label absolute left-4 top-3 text-gray-500 pointer-events-none">First Name</label>
+                            </div>
+                            
+                            <div class="relative">
+                                <input 
+                                    id="lastName" 
+                                    name="lastName" 
+                                    type="text" 
+                                    required 
+                                    class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
+                                    placeholder=" "
+                                >
+                                <label for="lastName" class="floating-label absolute left-4 top-3 text-gray-500 pointer-events-none">Last Name</label>
+                            </div>
+                        </div>
+
+                        <div class="relative mb-6">
+                            <input 
+                                id="email" 
+                                name="email" 
+                                type="email" 
+                                required 
+                                class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
+                                placeholder=" "
+                            >
+                            <label for="email" class="floating-label absolute left-4 top-3 text-gray-500 pointer-events-none">Email Address</label>
+                        </div>
+
+                        <div class="relative mb-6">
+                            <input 
+                                id="phone" 
+                                name="phone" 
+                                type="tel" 
+                                required 
+                                class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
+                                placeholder=" "
+                            >
+                            <label for="phone" class="floating-label absolute left-4 top-3 text-gray-500 pointer-events-none">Phone Number</label>
+                        </div>
+
+                        <div class="relative mb-6">
+                            <input 
+                                id="dateOfBirth" 
+                                name="dateOfBirth" 
+                                type="date" 
+                                required 
+                                class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
+                            >
+                            <label for="dateOfBirth" class="floating-label absolute left-4 top-3 text-gray-500 pointer-events-none">Date of Birth</label>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Medical Information -->
+                    <div id="step2" class="step-content hidden">
+                        <div class="relative mb-6">
+                            <select 
+                                id="bloodType" 
+                                name="bloodType" 
+                                required 
+                                class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
+                            >
+                                <option value="">Select Blood Type</option>
+                                <option value="A+">A+</option>
+                                <option value="A-">A-</option>
+                                <option value="B+">B+</option>
+                                <option value="B-">B-</option>
+                                <option value="AB+">AB+</option>
+                                <option value="AB-">AB-</option>
+                                <option value="O+">O+</option>
+                                <option value="O-">O-</option>
+                            </select>
+                            <label for="bloodType" class="floating-label absolute left-4 top-3 text-gray-500 pointer-events-none">Blood Type</label>
+                        </div>
+
+                        <div class="relative mb-6">
+                            <input 
+                                id="lastDonation" 
+                                name="lastDonation" 
+                                type="date" 
+                                class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
+                            >
+                            <label for="lastDonation" class="floating-label absolute left-4 top-3 text-gray-500 pointer-events-none">Last Donation Date (if any)</label>
+                        </div>
+
+                        <div class="space-y-4 mb-6">
+                            <h3 class="text-lg font-semibold text-gray-800">Medical History</h3>
+                            <div class="space-y-3">
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="medicalHistory" value="diabetes" class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded">
+                                    <span class="ml-2 text-sm text-gray-700">Diabetes</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="medicalHistory" value="hypertension" class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded">
+                                    <span class="ml-2 text-sm text-gray-700">Hypertension</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="medicalHistory" value="heartDisease" class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded">
+                                    <span class="ml-2 text-sm text-gray-700">Heart Disease</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="medicalHistory" value="none" class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded">
+                                    <span class="ml-2 text-sm text-gray-700">None of the above</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Location & Preferences -->
+                    <div id="step3" class="step-content hidden">
+                        <div class="relative mb-6">
+                            <input 
+                                id="address" 
+                                name="address" 
+                                type="text" 
+                                required 
+                                class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
+                                placeholder=" "
+                            >
+                            <label for="address" class="floating-label absolute left-4 top-3 text-gray-500 pointer-events-none">Address</label>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div class="relative">
+                                <input 
+                                    id="city" 
+                                    name="city" 
+                                    type="text" 
+                                    required 
+                                    class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
+                                    placeholder=" "
+                                >
+                                <label for="city" class="floating-label absolute left-4 top-3 text-gray-500 pointer-events-none">City</label>
+                            </div>
+                            
+                            <div class="relative">
+                                <input 
+                                    id="state" 
+                                    name="state" 
+                                    type="text" 
+                                    required 
+                                    class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
+                                    placeholder=" "
+                                >
+                                <label for="state" class="floating-label absolute left-4 top-3 text-gray-500 pointer-events-none">State</label>
+                            </div>
+                        </div>
+
+                        <div class="relative mb-6">
+                            <input 
+                                id="zipCode" 
+                                name="zipCode" 
+                                type="text" 
+                                required 
+                                class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
+                                placeholder=" "
+                            >
+                            <label for="zipCode" class="floating-label absolute left-4 top-3 text-gray-500 pointer-events-none">ZIP Code</label>
+                        </div>
+
+                        <div class="space-y-4 mb-6">
+                            <h3 class="text-lg font-semibold text-gray-800">Notification Preferences</h3>
+                            <div class="space-y-3">
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="notifications" value="emergency" checked class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded">
+                                    <span class="ml-2 text-sm text-gray-700">Emergency blood requests</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="notifications" value="reminders" checked class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded">
+                                    <span class="ml-2 text-sm text-gray-700">Donation reminders</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="notifications" value="updates" checked class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded">
+                                    <span class="ml-2 text-sm text-gray-700">BloodNet updates</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Navigation Buttons -->
+                    <div class="flex justify-between pt-6">
+                        <button 
+                            type="button" 
+                            id="prevBtn" 
+                            onclick="changeStep(-1)" 
+                            class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors hidden"
+                        >
+                            Previous
+                        </button>
+                        
+                        <button 
+                            type="button" 
+                            id="nextBtn" 
+                            onclick="changeStep(1)" 
+                            class="ml-auto bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition-colors"
+                        >
+                            Next Step
+                        </button>
+                        
+                        <button 
+                            type="submit" 
+                            id="submitBtn" 
+                            class="ml-auto bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition-colors hidden btn-pulse"
+                        >
+                            Complete Registration
+                        </button>
+                    </div>
+                </form>
+
+                <div class="mt-8 text-center">
+                    <p class="text-gray-600">Already have an account?</p>
+                    <a href="login.jsp" class="text-red-600 hover:text-red-500 font-semibold">Sign in here</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Success Message -->
+    <div id="successMessage" class="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300">
+        <div class="flex items-center">
+            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+            </svg>
+            Registration successful! Welcome to BloodNet!
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 3;
+
+        // Initialize floating labels
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeFloatingLabels();
+            updateStepDisplay();
+        });
+
+        function initializeFloatingLabels() {
+            const inputs = document.querySelectorAll('input, select');
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    const label = this.parentElement.querySelector('.floating-label');
+                    if (label) {
+                        label.classList.add('focused');
+                    }
+                });
+                
+                input.addEventListener('blur', function() {
+                    const label = this.parentElement.querySelector('.floating-label');
+                    if (label && !this.value) {
+                        label.classList.remove('focused');
+                    }
+                });
+                
+                // Check if input has value on load
+                if (input.value) {
+                    const label = input.parentElement.querySelector('.floating-label');
+                    if (label) {
+                        label.classList.add('focused');
+                    }
+                }
+            });
+        }
+
+        function changeStep(direction) {
+            const currentStepElement = document.getElementById(`step${currentStep}`);
+            const nextStep = currentStep + direction;
+            
+            if (nextStep < 1 || nextStep > totalSteps) return;
+            
+            // Validate current step
+            if (direction > 0 && !validateCurrentStep()) {
+                return;
+            }
+            
+            // Hide current step
+            currentStepElement.classList.add('hidden');
+            
+            // Update step indicators
+            updateStepIndicators(nextStep);
+            
+            // Show next step
+            currentStep = nextStep;
+            const nextStepElement = document.getElementById(`step${currentStep}`);
+            nextStepElement.classList.remove('hidden');
+            
+            updateStepDisplay();
+        }
+
+        function validateCurrentStep() {
+            const currentStepElement = document.getElementById(`step${currentStep}`);
+            const requiredInputs = currentStepElement.querySelectorAll('input[required], select[required]');
+            
+            for (let input of requiredInputs) {
+                if (!input.value.trim()) {
+                    input.focus();
+                    showMessage(`Please fill in all required fields in step ${currentStep}`, 'error');
+                    return false;
+                }
+            }
+            
+            return true;
+        }
+
+        function updateStepIndicators(step) {
+            const indicators = document.querySelectorAll('.step-indicator');
+            indicators.forEach((indicator, index) => {
+                const stepNumber = index + 1;
+                indicator.classList.remove('step-active', 'step-completed', 'step-pending');
+                
+                if (stepNumber < step) {
+                    indicator.classList.add('step-completed');
+                } else if (stepNumber === step) {
+                    indicator.classList.add('step-active');
+                } else {
+                    indicator.classList.add('step-pending');
+                }
+            });
+            
+            // Update progress bar
+            const progressBar = document.getElementById('progressBar');
+            const progress = ((step - 1) / (totalSteps - 1)) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+
+        function updateStepDisplay() {
+            const stepTitles = [
+                'Personal Information',
+                'Medical Information',
+                'Location & Preferences'
+            ];
+            
+            document.getElementById('stepTitle').textContent = stepTitles[currentStep - 1];
+            
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            if (currentStep === 1) {
+                prevBtn.classList.add('hidden');
+                nextBtn.classList.remove('hidden');
+                submitBtn.classList.add('hidden');
+            } else if (currentStep === totalSteps) {
+                prevBtn.classList.remove('hidden');
+                nextBtn.classList.add('hidden');
+                submitBtn.classList.remove('hidden');
+            } else {
+                prevBtn.classList.remove('hidden');
+                nextBtn.classList.remove('hidden');
+                submitBtn.classList.add('hidden');
+            }
+        }
+
+        function handleSubmit(event) {
+            event.preventDefault();
+            
+            if (!validateCurrentStep()) {
+                return;
+            }
+            
+            // Show loading
+            const submitBtn = document.getElementById('submitBtn');
+            const originalText = submitBtn.textContent;
+            submitBtn.innerHTML = '<div class="loading-spinner mx-auto"></div>';
+            submitBtn.disabled = true;
+            
+            // Simulate form processing
+            setTimeout(() => {
+                showMessage('Registration successful! Welcome to BloodNet!', 'success');
+                document.getElementById('registrationForm').reset();
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+                
+                // Redirect to login after 3 seconds
+                setTimeout(() => {
+                    window.location.href = 'login.jsp';
+                }, 3000);
+            }, 2000);
+        }
+
+        function showMessage(message, type) {
+            const successMessage = document.getElementById('successMessage');
+            
+            if (type === 'error') {
+                successMessage.className = 'fixed top-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300';
+            } else {
+                successMessage.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300';
+            }
+            
+            successMessage.querySelector('span').textContent = message;
+            successMessage.classList.remove('translate-x-full');
+            
+            setTimeout(() => {
+                successMessage.classList.add('translate-x-full');
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
